@@ -10,6 +10,11 @@ services:
     entrypoint: "python manage.py runserver 0.0.0.0:80"
 
   dev-frontend:
-    extends:
-      file: docker-compose.yml
-      service: frontend
+    build:
+      context: "./frontend"
+      target: "prerelease"
+    environment:
+      - HOSTNAME=dev-frontend
+    ports:
+      - "3000:3000"
+    entrypoint: "bun run dev"

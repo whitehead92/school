@@ -63,6 +63,7 @@ export default defineConfig({
     ],
   },
   server: {
+    host: process.env['HOSTNAME'] ?? 'localhost',
     port: 3000,
   },
 })
