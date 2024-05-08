@@ -1,0 +1,18 @@
+server {
+    listen      80;
+    server_name ${EXTERNAL_HOST};
+    rewrite ^ https://$host$request_uri? permanent;
+}
+
+server {
+    listen      443 ssl;
+    server_name ${EXTERNAL_HOST};
+
+    ssl_certificate     /etc/nginx/certs/school.dev.crt;
+    ssl_certificate_key /etc/nginx/certs/school.dev.key;
+#    ssl_password_file /etc/nginx/certs/school.dev.pass;
+
+    location / {
+        proxy_pass http://${FRONTEND_HOST}:${FRONTEND_PORT};
+    }
+}

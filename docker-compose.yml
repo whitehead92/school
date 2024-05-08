@@ -1,8 +1,78 @@
 version: "3.8"
 
 services:
+  dns:
+#    restart: always
+    image: strm/dnsmasq
+#    volumes:
+#      - ./dnsmasq.conf:/etc/dnsmasq.conf
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    cap_add:
+      - NET_ADMIN
+    env_file: .env
+    command: [
+      "--log-queries",
+      "--log-facility=-",
+      "--address=/$EXTERNAL_HOST/192.168.0.114"
+    ]
+
+  web:
+    profiles:
+      - deploy
+    build:
+      context: "./nginx"
+    env_file: .env
+    ports:
+      - "80:80"
+
+  web-dev:
+    extends:
+      service: web
+    profiles:
+      - dev
+    depends_on:
+      - frontend-dev
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./nginx/templates
+          target: /etc/nginx/templates
+    environment:
+      - FRONTEND_HOST=frontend-dev
+      - FRONTEND_PORT=3000
+    ports:
+      - "80:80"
+      - "443:443"
+
   backend:
+    profiles:
+      - deploy
     build: "./backend"
 
   frontend:
-    build: "./frontend"
+    profiles:
+      - deploy
+    build:
+      context: "./frontend"
+      target: "dev"
+
+  frontend-dev:
+    profiles:
+      - dev
+    build:
+      context: "./frontend"
+      target: "prerelease"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /usr/src/app
+          ignore:
+            - /frontend/node_modules/
+        - action: rebuild
+          path: package.json
+    environment:
+      - FRONTEND_PORT=3000
+    entrypoint: "bun run dev"
