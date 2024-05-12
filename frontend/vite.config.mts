@@ -11,6 +11,10 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
+let hostname: string = process.env['HOSTNAME'] ?? '0.0.0.0'
+let port: number = process.env['FRONTEND_PORT'] ?? 3000
+let hmr_path: string = process.env['HMR_PATH'] ?? ''
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -63,7 +67,10 @@ export default defineConfig({
     ],
   },
   server: {
-    host: process.env['HOSTNAME'] ?? '0.0.0.0',
-    port: process.env['FRONTEND_PORT'] ?? 3000,
+    host: hostname,
+    port: port,
+    hmr: {
+      path: `/${hmr_path}/`,
+    },
   },
 })

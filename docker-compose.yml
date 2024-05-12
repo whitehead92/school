@@ -44,6 +44,7 @@ services:
       - BACKEND_PORT=$DEV_BACKEND_PORT
       - BACKEND_STATIC_HOST=backend-dev
       - BACKEND_STATIC_PORT=$DEV_BACKEND_PORT
+      - BACKEND_HMR_PATH=$DEV_FRONTEND_HMR_PATH
     ports:
       - "80:80"
       - "443:443"
@@ -91,4 +92,5 @@ services:
           path: package.json
     environment:
       - FRONTEND_PORT=$DEV_FRONTEND_PORT
+      - HMR_PATH=$DEV_FRONTEND_HMR_PATH
     entrypoint: "bun run dev"

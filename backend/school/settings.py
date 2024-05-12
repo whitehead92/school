@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     getenv('EXTERNAL_HOST', 'localhost'),
-    'backend-dev',
+    'backend',
 ]
 
 
