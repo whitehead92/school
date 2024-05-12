@@ -2,10 +2,7 @@ version: "3.8"
 
 services:
   dns:
-#    restart: always
     image: strm/dnsmasq
-#    volumes:
-#      - ./dnsmasq.conf:/etc/dnsmasq.conf
     ports:
       - "53:53/udp"
       - "53:53/tcp"
@@ -34,6 +31,7 @@ services:
       - dev
     depends_on:
       - frontend-dev
+      - backend-dev
     develop:
       watch:
         - action: sync+restart
@@ -41,7 +39,11 @@ services:
           target: /etc/nginx/templates
     environment:
       - FRONTEND_HOST=frontend-dev
-      - FRONTEND_PORT=3000
+      - FRONTEND_PORT=$DEV_FRONTEND_PORT
+      - BACKEND_HOST=backend-dev
+      - BACKEND_PORT=$DEV_BACKEND_PORT
+      - BACKEND_STATIC_HOST=backend-dev
+      - BACKEND_STATIC_PORT=$DEV_BACKEND_PORT
     ports:
       - "80:80"
       - "443:443"
@@ -50,6 +52,20 @@ services:
     profiles:
       - deploy
     build: "./backend"
+
+  backend-dev:
+    profiles:
+      - dev
+    extends:
+      service: backend
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app/school
+        - action: rebuild
+          path: requirements.txt
+    entrypoint: "python manage.py runserver 0.0.0.0:${DEV_BACKEND_PORT}"
 
   frontend:
     profiles:
@@ -74,5 +90,5 @@ services:
         - action: rebuild
           path: package.json
     environment:
-      - FRONTEND_PORT=3000
+      - FRONTEND_PORT=$DEV_FRONTEND_PORT
     entrypoint: "bun run dev"

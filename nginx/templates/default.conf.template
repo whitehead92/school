@@ -12,6 +12,18 @@ server {
     ssl_certificate_key /etc/nginx/certs/school.dev.key;
 #    ssl_password_file /etc/nginx/certs/school.dev.pass;
 
+    location /api/ {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
+    }
+
+    location /admin/ {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
+    }
+
+    location /static/ {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
+    }
+
     location / {
         proxy_pass http://${FRONTEND_HOST}:${FRONTEND_PORT};
     }
