@@ -1,6 +1,8 @@
 services:
   backend:
     build: backend
+    environment:
+      - EXTERNAL_HOST=$EXTERNAL_HOST
 
   frontend:
     build:

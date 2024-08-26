@@ -31,6 +31,10 @@ ALLOWED_HOSTS = [
     'backend',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://' + getenv('EXTERNAL_HOST', 'localhost'),
+]
+
 
 # Application definition
 
