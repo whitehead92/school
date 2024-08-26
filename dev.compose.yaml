@@ -1,0 +1,60 @@
+services:
+  dns:
+    image: strm/dnsmasq
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./dns/dnsmasq.conf:/etc/dnsmasq.conf
+
+  backend:
+    extends:
+      file: compose.yaml
+      service: backend
+    entrypoint: "python manage.py runserver 0.0.0.0:${DEV_BACKEND_PORT}"
+    develop:
+      watch:
+        - path: ./backend
+          target: /app/school
+          action: sync
+        - path: requirements.txt
+          action: rebuild
+
+  frontend:
+    build:
+      context: frontend
+      target: "prerelease"
+    environment:
+      - FRONTEND_PORT=$DEV_FRONTEND_PORT
+      - HMR_PATH=$DEV_FRONTEND_HMR_PATH
+    entrypoint: "bun run dev"
+    develop:
+      watch:
+        - path: ./frontend
+          action: sync
+          target: /usr/src/app
+          ignore:
+            - /frontend/node_modules/
+        - path: package.json
+          action: rebuild
+
+  web:
+    extends:
+      file: compose.yaml
+      service: web
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      - FRONTEND_PORT=$DEV_FRONTEND_PORT
+      - BACKEND_PORT=$DEV_BACKEND_PORT
+      - BACKEND_STATIC_HOST=backend
+      - BACKEND_STATIC_PORT=$DEV_BACKEND_PORT
+      - BACKEND_HMR_PATH=$DEV_FRONTEND_HMR_PATH
+    develop:
+      watch:
+        - path: ./nginx/templates
+          target: /etc/nginx/templates
+          action: sync+restart

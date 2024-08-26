@@ -9,3 +9,5 @@ RUN cd /tmp/dev && bun install --frozen-lockfile
 FROM base as prerelease
 COPY --from=install /tmp/dev/node_modules node_modules
 COPY . .
+
+# TODO: add build stage and nginx, deploying it
