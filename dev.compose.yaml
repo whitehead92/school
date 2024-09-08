@@ -9,6 +9,13 @@ services:
     volumes:
       - ./dns/dnsmasq.conf:/etc/dnsmasq.conf
 
+  db:
+    extends:
+      file: compose.yaml
+      service: db
+    ports:
+      - 5432:5432
+
   backend:
     extends:
       file: compose.yaml
@@ -19,7 +26,7 @@ services:
         - path: ./backend
           target: /app/school
           action: sync
-        - path: requirements.txt
+        - path: ./backend/requirements.txt
           action: rebuild
 
   frontend:

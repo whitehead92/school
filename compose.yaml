@@ -1,6 +1,16 @@
 services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+
   backend:
-    build: backend
+    build:
+      context: backend
+      target: "base"
+    env_file:
+      - .env
     environment:
       - EXTERNAL_HOST=$EXTERNAL_HOST
 
